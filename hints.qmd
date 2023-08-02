@@ -1,0 +1,19 @@
+---
+title: "hints"
+format: html
+---
+
+
+## Layout and Agenda
+
+1. Genesis of the work
+
+
+1. How we did the work
+
+1. Results
+
+1. Management implications
+
+1. Recommendations
+

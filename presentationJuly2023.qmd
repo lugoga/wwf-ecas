@@ -1,0 +1,656 @@
+---
+title: "THE STATE OF THE ELECTRONIC CATCH ASSESSMENT (eCAS) SURVEY IN RUMAKI SEASCAPE"
+subtitle: "A case of Kibiti, Mafia, and Kilwa Districts"
+author: "Baraka Kuguru, Innocent Sailale, Masumbuko Semba & Owen Kibona"
+date: "Stakeholder Presentation: 02 August, 2023"
+format: 
+    revealjs:
+      reference-location: document
+      theme: serif
+      highlight-style: ayu-mirage
+
+execute: 
+  echo: false
+  warning: false
+  message: false
+  comment: ""
+
+slide-number: true
+theme: "journal"
+code-fold: true
+code-line-numbers: true
+logo: wwf.png
+css: style.css
+---
+
+```{r}
+require(tidyverse)
+require(sf)
+require(terra)
+require(magrittr)
+require(patchwork)
+require(gt)
+require(tmap)
+
+tmap_mode(mode = "view")
+tmap_options(check.and.fix = TRUE)
+```
+
+
+# Layout
+## Agenda
+
+1. Genesis of the work
+1. How we did the work
+1. Results
+1. Management implications
+1. Recommendations
+
+
+# Genesis of the work
+## Genesis ....
+
++ Previous assessment focused on fisheries performance
+    -RUMAKI
+    -Non RUMAKI
+    
++ It used electronic Catch Assement Survey (eCAS) Data
++ Enviromental Data (SST, Chl-a)
++ The findings from this assesment led to explore the baseline 
+
+
+## objectives
+
+1. To analyze the quantity and quality of the available eCAS data
+1. To assess the spatial distribution of priority fisheries
+1. Assess annual catch rate trends from eCAS and MIMP dataset
+1. Assess annual production trends from CAS and eCAS dataset
+1. To identify fisheries performance indicator
+    
+# How the work was done
+
+## RUMAKI SeaScape
+:::: {.columns}
+::: {.column width="40%"}
+
+The study was conducted in the seascape of *Kibiti*, *Kiwa* and *Mafia* 
+
++ Over 50% of landing sites records in eCAS
++ High biodiversity
++ High fish production
++ WWF Conservation Area
+
+:::
+
+::: {.column width="60%"}
+
+
+```{r}
+#| out-width: "150%"
+
+knitr::include_graphics("map.png")
+
+```
+
+:::
+
+::::
+
+
+
+## Datasets
+
+```{r}
+read_csv("datasets_table.csv") %>% 
+  gt::gt()%>% 
+  gt::opt_interactive(
+    use_search = TRUE,
+    # use_filters = TRUE,
+    use_resizers = TRUE,
+    use_highlight = TRUE,
+    use_compact_mode = TRUE,
+    use_text_wrapping = FALSE,
+    use_page_size_select = TRUE
+  ) 
+```
+
+ 
+## CFMAS
+
+```{r}
+knitr::include_graphics("tab22.png")
+```
+
+## Catch Records
+```{r}
+knitr::include_graphics("tab23.png")
+```
+
+## Priority fisheries
+```{r}
+knitr::include_graphics("tab25.png")
+```
+
+
+## Catch Rate Analysis
+
+
+:::: {.columns}
+::: {.column width="60%"}
+
+
+
+$$
+CatchRate_{(i,j)} = \frac{Weight_{(i,j)}}{Fishers_{(i,j)}}
+$$ {#eq-eqn1}
+Where: 
+
+$i$ = vessels 
+
+$j$ = priority fishery
+:::
+
+::: {.column width="40%"}
+
+
+```{r}
+#| out-width: "100%"
+
+knitr::include_graphics("data_model.png")
+
+```
+
+:::
+
+::::
+
+
+## Annual Production Analysis
+
+
+:::: {.columns}
+::: {.column width="60%"}
+
+
+$$
+TP = \frac{\gamma}{\iota} \times \frac{\omega}{\alpha} \times \kappa
+$$ {#eq-eqn2}
+Where: 
+
+$\gamma$ = weight
+
+$\iota$ = boat gear combination
+
+$\omega$ = active fishing days
+
+$\alpha$ = Number of days in a month
+
+$\kappa$ = Total number of fishing effort (boat gear) in a distric
+
+:::
+
+::: {.column width="40%"}
+
+
+```{r}
+#| out-width: "100%"
+
+knitr::include_graphics("data_model.png")
+
+```
+
+:::
+
+::::
+
+# Key findings
+# Quantity and Quality of eCAS data
+
+## Quantity by district and priority fishery
+
+```{r}
+knitr::include_graphics("tab31.png")
+```
+
+## Quantity by district and ...... {.scrollable}
+
+```{r}
+ecas.master = read_csv("../figuresMarch/rumaki_ecas_pririty_cfma.csv")
+
+set.seed(125)
+ecas.master%>% 
+  select(year,landing_site, priority, fisher = fisher_number, weight,  catch_rate) %>% 
+  filter(catch_rate < 200) %>% 
+  sample_n(1000) %>% 
+  mutate(across(is.numeric, round, 1)) %>%
+  gt::gt() %>% 
+  gt::opt_interactive(
+    use_search = TRUE,
+    # use_filters = TRUE,
+    use_resizers = TRUE,
+    use_highlight = TRUE,
+    use_compact_mode = TRUE,
+    use_text_wrapping = FALSE,
+    use_page_size_select = TRUE
+  )%>% 
+  # fmt_number(decimals = 2) |>
+  fmt_integer(year)|>
+  fmt_integer(fisher) |>
+  cols_label_with(
+    fn = ~ janitor::make_clean_names(., case = "all_caps")
+  ) |>
+  data_color(
+    columns = fisher,
+    palette = "Greens"
+  ) |>
+  data_color(
+    columns = weight,
+    palette = "Blues"
+  ) |>
+  data_color(
+    columns = catch_rate,
+    palette = "Reds"
+  )
+```
+
+
+
+
+## Quantity by CFMA and priority fishery
+
+```{r}
+knitr::include_graphics("tab32.png")
+```
+
+## Quantity by CFMA and priority fishery....
+
+:::: {.columns}
+::: {.column width="40%"}
+
+Based on the amount of catch data records in the eCAS system, we only selected;   
+
++ Six priority fisheries
++ Six CFMAS with over 1000 records
+
+:::
+
+::: {.column width="60%"}
+
+
+```{r}
+#| out-width: "200%"
+
+knitr::include_graphics("fig31.png")
+
+```
+
+:::
+
+::::
+
+
+
+
+## eCAS percentage of gear by CFMA
+
+```{r}
+knitr::include_graphics("tab33.png")
+```
+
+## eCAS percentage of gear by Priority fishery
+
+```{r}
+knitr::include_graphics("tab34.png")
+```
+
+# Spatial distribution of priority fisheries
+## catch rates by Priority fishery & CFMAs
+
+```{r}
+knitr::include_graphics("tab35.png")
+```
+
+## Reef fishery by CFMAS
+:::: {.columns}
+::: {.column width="40%"}
+
+
+```{r}
+#| out-width: "130%"
+
+knitr::include_graphics("fig32map.png")
+
+```
+
+:::
+
+::: {.column width="60%"}
+
+
+```{r}
+#| out-width: "100%"
+
+knitr::include_graphics("fig32cr.png")
+
+```
+
+:::
+
+::::
+
+
+## Small Pelagics fishery by CFMAS
+:::: {.columns}
+::: {.column width="40%"}
+
+
+```{r}
+#| out-width: "130%"
+
+knitr::include_graphics("fig32map.png")
+
+```
+
+:::
+
+::: {.column width="60%"}
+
+
+```{r}
+#| out-width: "100%"
+
+knitr::include_graphics("fig33.png")
+
+```
+
+:::
+
+::::
+
+
+
+## Tuna fishery by CFMAS
+:::: {.columns}
+::: {.column width="40%"}
+
+
+```{r}
+#| out-width: "130%"
+
+knitr::include_graphics("fig34map.png")
+
+```
+
+:::
+
+::: {.column width="60%"}
+
+
+```{r}
+#| out-width: "100%"
+
+knitr::include_graphics("fig34cr.png")
+
+```
+
+:::
+
+::::
+
+
+## Octopus fishery by CFMAS
+:::: {.columns}
+::: {.column width="40%"}
+
+
+```{r}
+#| out-width: "130%"
+
+knitr::include_graphics("fig35map.png")
+
+```
+
+:::
+
+::: {.column width="60%"}
+
+
+```{r}
+#| out-width: "100%"
+
+knitr::include_graphics("fig35cr.png")
+
+```
+
+:::
+
+::::
+
+
+
+## Elasmobranches fishery by CFMAS
+:::: {.columns}
+::: {.column width="40%"}
+
+
+```{r}
+#| out-width: "130%"
+
+knitr::include_graphics("fig36map.png")
+
+```
+
+:::
+
+::: {.column width="60%"}
+
+
+```{r}
+#| out-width: "100%"
+
+knitr::include_graphics("fig36cr.png")
+
+```
+
+:::
+
+::::
+
+
+
+## Prawns  fishery by CFMAS {.scrollable .incremental}
+:::: {.columns}
+::: {.column width="40%"}
+
+
+```{r}
+#| out-width: "130%"
+
+knitr::include_graphics("fig37map.png")
+
+```
+
+:::
+
+::: {.column width="60%"}
+
+
+```{r}
+#| out-width: "100%"
+
+knitr::include_graphics("fig37cr.png")
+
+```
+
+:::
+::::
+
+
+
+
+## Other fisher fishery by CFMAS
+
+:::: {.columns}
+::: {.column width="40%"}
+
+
+```{r}
+#| out-width: "130%"
+
+knitr::include_graphics("fig38map.png")
+
+```
+
+:::
+
+::: {.column width="60%"}
+
+
+```{r}
+#| out-width: "100%"
+
+knitr::include_graphics("fig38cr.png")
+
+```
+
+:::
+::::
+
+## Catch rate trend by districts
+
+```{r}
+knitr::include_graphics("fig39.png")
+```
+
+## Catch rate trend by CFMAs
+
+```{r}
+knitr::include_graphics("fig310.png")
+```
+
+
+## Total production by districts
+
+```{r}
+knitr::include_graphics("fig311.png")
+```
+
+
+## Total production by systems
+
+```{r}
+knitr::include_graphics("fig312.png")
+```
+
+
+
+## Fisheries Performance Indicators
+
+```{r}
+knitr::include_graphics("tab36.png")
+```
+
+## The Management implications
+
++ The digitalization of fishery sector
++ Enhance data collection and storage
++ Foster collaboration between stakeholders
++ Availability and accessibility
++ Increase efficiency
+
+## Recommendations
+
++ Data collection at CFMA level
++ Improve data monitoring strategy
++ Add Automated data quality monitoring tools
++ 
+
+# Acknowledgements
+
+```{r}
+knitr::include_graphics("coat_tafiri_wwf-01.png")
+```
+
+
+# Miscellenous
+
+## The Coastal Richness
+
+```{r}
+## data
+
+landing.sites = st_read("f:/shapefile/tansea/tza_zan_fish_landing_sites_10k.shp", quiet = TRUE)
+iba = st_read("f:/shapefile/tansea/tza_important_bird_areas_.shp", quiet = TRUE)
+coelacanth = st_read("f:/shapefile/tansea/tza_coelacanth_200k.shp", quiet = TRUE)
+dolphin = st_read("f:/shapefile/tansea/tza_dolphin_sites_200k.shp", quiet = TRUE)
+dugong = st_read("f:/shapefile/tansea/tza_dugong_sightings_200k.shp", quiet = TRUE)
+prawn.culture = st_read("f:/shapefile/tansea/tza_fish_prawn_culture_10k.shp", quiet = TRUE)
+ports = st_read("f:/shapefile/tansea/tza_harbours_and_ports.shp", quiet = TRUE)
+mpa = st_read("f:/shapefile/tansea/tza_marine_protected_areas_xx.shp", quiet = TRUE)
+coastal_features = st_read("f:/vpo/data/shp/coastal_land_cover.shp", quiet = TRUE) %>% 
+  janitor::clean_names() 
+coastal.only = coastal_features %>% 
+  filter(class %in% c("Mangrove", "Salt marsh", "Tidal reef", "Salt pan", "Saline bare area", "Sand", "Seagrass", "Swamp") )
+
+
+cfma = st_read("f:/shapefile/cfmas_tz.gpkg", quiet = TRUE) %>% 
+  st_make_valid()
+
+```
+
+
+
+```{r}
+
+
+tm_shape(shp = iba, name = "Important Bird Areas")+
+  tm_fill(col = "red", alpha = .1, popup.vars = "Name_1")+
+tm_shape(shp = mpa, name = "Marine Protected Areas")+
+  tm_fill(col = "green", alpha = .1)+
+tm_shape(shp = coastal.only %>% dplyr::select(class), name = "Coastal Habitat") +
+  tm_fill(col = "class", title = "Habitat Type") +
+tm_shape(shp = coelacanth %>% dplyr::select(NAME), name = "Coelacanth Sites") +
+  tm_symbols(col = "blue", border.col = "darkblue", size = .02, alpha = .1)+
+tm_shape(shp = dolphin %>% dplyr::select(NAME), name = "Dolphin Sites")+
+  tm_symbols(size = 0.02, col = "green", border.col = "green", alpha = .2)+
+tm_shape(shp = dugong %>% dplyr::select(Name), name = "Dugong Sites")+
+  tm_symbols(size = 0.02, col = "maroon", border.col = "maroon", alpha = .2)+
+tm_shape(shp = ports %>% dplyr::select(Name), name = "Harbours and Ports")+
+  tm_symbols(size = 0.02, col = "darkgreen", border.col = "darkgreen", alpha = .2)+
+tm_shape(shp = landing.sites %>% dplyr::select(Name) %>% distinct(Name, .keep_all = TRUE), name = "Landing Sites") +
+  tm_markers(clustering = TRUE, text ="Name" ,  text.just = "top",  markers.on.top.of.text = FALSE,  group = NA)+
+tm_shape(shp = prawn.culture, name = "Prawn Culture") +
+  tm_markers(clustering = TRUE, text ="Name" ,  text.just = "top",  markers.on.top.of.text = FALSE,  group = NA)+
+  tm_shape(shp = cfma)+
+  tm_fill(col = NA, id = "name", alpha = 0) + 
+  tm_borders(col = "black", lwd = .5)
+
+
+```
+
+
+## Mafia Benthic 
+
+```{r}
+#| eval: false
+#| 
+benthic = st_read("f:/shapefile/bongo_benthic/Benthic-Map/benthic.gpkg", quiet = TRUE)
+```
+
+```{r}
+#| eval: false
+#| 
+mimp = benthic %>% 
+  st_intersection(mpa %>% filter(Name == "Mafia Is. MP"))
+
+```
+
+
+
+```{r}
+#| eval: false
+#| 
+tm_shape(shp = mimp) +
+  tm_fill(col = "class")
+```
+
