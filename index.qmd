@@ -8,6 +8,10 @@ format:
       reference-location: document
       theme: serif
       highlight-style: ayu-mirage
+      # title-slide-attributes: 
+      #  data-background-image: "https://placeholder.pics/svg/100,https://picsum.photos/id/870/800/600?grayscale"
+      #  data-background-size: 100px, cover
+      #  data-background-position: 2% 98%, center
 
 execute: 
   echo: false
@@ -38,6 +42,11 @@ tmap_options(check.and.fix = TRUE)
 
 
 # Layout
+
+```{r}
+knitr::include_graphics("coat_tafiri_wwf-01.png")
+```
+
 ## Agenda
 
 1. Genesis of the work
@@ -45,6 +54,9 @@ tmap_options(check.and.fix = TRUE)
 1. Results
 1. Management implications
 1. Recommendations
+
+
+
 
 
 # Genesis of the work
